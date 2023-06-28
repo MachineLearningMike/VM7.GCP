@@ -929,8 +929,6 @@ def get_datasets_3(
         assert dx == x.shape[1]
         assert dy == y.shape[1]
 
-        y[:, non_target_features_relative] = 0.0 # Start/Stop = NoInfo = 0.0
-
         return x, y[:-1], y[1:]
         # so M(x, [y[0]]) -> y[1], M(x, [y[0], y[1]]) -> y[2], ..., M(x, [y[0], ..., y[-2]]) -> y[-1]
         # where y[0] = Start, y[-1] = End.
@@ -999,8 +997,6 @@ def get_datasets_no_end(
 
         y = np.reshape(Candles[anchor + Nx: anchor + Nx + Ny][:, y_indices[0]][:, :, y_indices[1]], (Ny, -1))
 
-        y = y * learning_mask
-
         if Time_into_X is True:
             assert Times is not None
             y_time = np.reshape(Times[anchor + Nx: anchor + Nx + Ny], (Ny, -1))
@@ -1023,8 +1019,6 @@ def get_datasets_no_end(
         if x.shape[-1] % 2 != 0:
             x = np.pad(x, [[0,0], [0,1]], constant_values=0) # (0 pre-pad: Start, 0 post-pad: End) on axis 0. (0 pre-pad, 1 post-pad) on axis 1.
             y = np.pad(y, [[0,0], [0,1]], constant_values=0)
-
-        y[:, non_target_features_relative] = 0.0 # Start/Stop = NoInfo = 0.0
 
         # So, Y_true[-1] does not participate in y[:-1]. And End no in y[1:]
         # So, if Ny == 1, then y[:-1] has Start only, and y[1:] has Y_true[0] only.
